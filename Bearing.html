@@ -1,0 +1,687 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Bearing</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:opsz,wght@9..144,400;9..144,500;9..144,600&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --bg: #E3E7E6;
+    --surface: #FBFCFB;
+    --ink: #1F2A2E;
+    --muted: #5C6B6E;
+    --accent: #9B7327;
+    --accent-ink: #FBFCFB;
+    --line: rgba(31,42,46,0.16);
+    --danger: #A2453A;
+    box-sizing: border-box;
+    padding-top: env(safe-area-inset-top, 0px);
+    padding-bottom: env(safe-area-inset-bottom, 0px);
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #17222A;
+      --surface: #1E2C36;
+      --ink: #E7EDEE;
+      --muted: #93A5AA;
+      --accent: #D4A65A;
+      --accent-ink: #17222A;
+      --line: rgba(231,237,238,0.14);
+      --danger: #E08A7D;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #17222A;
+    --surface: #1E2C36;
+    --ink: #E7EDEE;
+    --muted: #93A5AA;
+    --accent: #D4A65A;
+    --accent-ink: #17222A;
+    --line: rgba(231,237,238,0.14);
+    --danger: #E08A7D;
+  }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font-family: 'IBM Plex Sans', system-ui, sans-serif;
+    line-height: 1.55;
+    min-height: 100%;
+  }
+  .wrap {
+    max-width: 920px;
+    margin: 0 auto;
+    padding: 32px 20px 80px;
+  }
+  header.top {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-end;
+    gap: 16px;
+    padding-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+    margin-bottom: 28px;
+    flex-wrap: wrap;
+  }
+  h1 {
+    font-family: 'Fraunces', serif;
+    font-optical-sizing: auto;
+    font-weight: 600;
+    font-size: 2.1rem;
+    margin: 0 0 4px;
+    letter-spacing: -0.01em;
+  }
+  .tagline {
+    color: var(--muted);
+    font-size: 0.95rem;
+    max-width: 46ch;
+  }
+  .date-badge {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.85rem;
+    color: var(--muted);
+    text-align: right;
+  }
+  .streaks {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.8rem;
+    color: var(--accent);
+    margin-top: 4px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: 32px;
+  }
+  @media (min-width: 780px) {
+    .grid { grid-template-columns: 1.1fr 0.9fr; align-items: start; }
+  }
+  section.panel {
+    background: var(--surface);
+    border: 1px solid var(--line);
+    border-left: 3px solid var(--accent);
+    padding: 20px 22px;
+  }
+  section.panel + section.panel { margin-top: 24px; }
+  h2 {
+    font-family: 'Fraunces', serif;
+    font-weight: 500;
+    font-size: 1.25rem;
+    margin: 0 0 14px;
+  }
+  .goal {
+    padding: 12px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .goal:last-child { border-bottom: none; }
+  .goal-head {
+    display: flex;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 10px;
+  }
+  .goal-name {
+    font-weight: 600;
+    font-size: 1rem;
+  }
+  .goal-role {
+    font-size: 0.78rem;
+    color: var(--muted);
+    text-transform: lowercase;
+  }
+  .goal-anchor {
+    font-size: 0.9rem;
+    color: var(--muted);
+    margin-top: 3px;
+  }
+  .goal-actions {
+    margin-top: 8px;
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+  }
+  button {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.82rem;
+    background: none;
+    border: 1px solid var(--line);
+    color: var(--ink);
+    padding: 6px 11px;
+    cursor: pointer;
+    border-radius: 3px;
+  }
+  button:hover { border-color: var(--accent); }
+  button.primary {
+    background: var(--accent);
+    color: var(--accent-ink);
+    border-color: var(--accent);
+    font-weight: 500;
+  }
+  button.quiet {
+    border-color: transparent;
+    color: var(--muted);
+    padding: 6px 4px;
+  }
+  button:focus-visible, input:focus-visible, textarea:focus-visible, select:focus-visible {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+  }
+  .task-row {
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+  }
+  .task-row:last-child { border-bottom: none; }
+  .task-row input[type="checkbox"] {
+    width: 18px; height: 18px;
+    margin-top: 2px;
+    accent-color: var(--accent);
+  }
+  .task-text { flex: 1; }
+  .task-text.done { color: var(--muted); text-decoration: line-through; }
+  .task-goal-tag {
+    display: block;
+    font-size: 0.72rem;
+    color: var(--muted);
+    margin-top: 2px;
+  }
+  .empty {
+    color: var(--muted);
+    font-size: 0.9rem;
+    padding: 6px 0 4px;
+  }
+  form.inline {
+    display: flex;
+    gap: 8px;
+    margin-top: 14px;
+    flex-wrap: wrap;
+  }
+  form.inline input[type="text"], form.inline select, textarea {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.88rem;
+    padding: 7px 9px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+    border-radius: 3px;
+  }
+  form.inline input[type="text"] { flex: 1; min-width: 140px; }
+  .new-goal-form {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+    margin-top: 14px;
+  }
+  .new-goal-form input, .new-goal-form select {
+    font-family: 'IBM Plex Sans', sans-serif;
+    font-size: 0.88rem;
+    padding: 7px 9px;
+    border: 1px solid var(--line);
+    background: var(--bg);
+    color: var(--ink);
+    border-radius: 3px;
+  }
+  .new-goal-form input[type="text"]:first-child,
+  .new-goal-form input.full { grid-column: 1 / -1; }
+  textarea {
+    width: 100%;
+    min-height: 70px;
+    resize: vertical;
+    margin-bottom: 10px;
+  }
+  .review-entry {
+    padding: 10px 0;
+    border-bottom: 1px solid var(--line);
+    font-size: 0.88rem;
+  }
+  .review-entry:last-child { border-bottom: none; }
+  .review-week {
+    font-family: 'IBM Plex Mono', monospace;
+    font-size: 0.75rem;
+    color: var(--muted);
+  }
+  .review-prompt {
+    background: var(--accent);
+    color: var(--accent-ink);
+    padding: 14px 16px;
+    margin-bottom: 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 12px;
+    flex-wrap: wrap;
+  }
+  .review-prompt p { margin: 0; font-size: 0.92rem; }
+  footer.bottom {
+    margin-top: 40px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+    font-size: 0.78rem;
+    color: var(--muted);
+    display: flex;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+  }
+  .overflow-x { overflow-x: auto; }
+  @media (prefers-reduced-motion: no-preference) {
+    .goal, .task-row { transition: opacity 0.15s ease; }
+  }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1>Bearing</h1>
+      <div class="tagline">Two vehicles, one pilot. Log the day, not the mood — the streak is the only opinion that matters.</div>
+    </div>
+    <div>
+      <div class="date-badge" id="todayLabel"></div>
+      <div class="streaks" id="streakLine"></div>
+    </div>
+  </header>
+
+  <div id="reviewPromptSlot"></div>
+
+  <div class="grid">
+    <div>
+      <section class="panel">
+        <h2>Today</h2>
+        <div id="todayList"></div>
+        <form class="inline" id="adhocForm">
+          <input type="text" id="adhocText" placeholder="Add a one-off task for today" required>
+          <select id="adhocGoal"></select>
+          <button class="primary" type="submit">Add</button>
+        </form>
+      </section>
+    </div>
+
+    <div>
+      <section class="panel">
+        <h2>Vehicles</h2>
+        <div id="goalsList"></div>
+        <div class="new-goal-form" id="newGoalForm">
+          <input type="text" id="goalName" placeholder="Name (e.g. Forex)">
+          <select id="goalRole">
+            <option value="vehicle">Vehicle — commercial</option>
+            <option value="depth">Depth — mastery</option>
+            <option value="exploring">Exploring — not decided yet</option>
+          </select>
+          <input class="full" type="text" id="goalAnchor" placeholder="Daily anchor task (e.g. Journal + review trades, 45 min)">
+        </div>
+        <div class="goal-actions">
+          <button class="primary" id="addGoalBtn" type="button">Add vehicle</button>
+        </div>
+      </section>
+
+      <section class="panel">
+        <h2>Weekly review</h2>
+        <div id="reviewForm"></div>
+        <div id="reviewHistory"></div>
+      </section>
+    </div>
+  </div>
+
+  <footer class="bottom">
+    <span>Stored only in this browser, on this device.</span>
+    <button class="quiet" id="resetBtn" type="button">Clear all data</button>
+  </footer>
+
+</div>
+
+<script>
+(function(){
+  var STORAGE_KEY = 'bearing_log_v1';
+  var REVIEW_DAY = 0; // Sunday
+
+  function todayStr(d){
+    d = d || new Date();
+    return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0');
+  }
+  function addDays(dateStr, n){
+    var d = new Date(dateStr + 'T00:00:00');
+    d.setDate(d.getDate() + n);
+    return todayStr(d);
+  }
+  function isoWeekStart(dateStr){
+    var d = new Date(dateStr + 'T00:00:00');
+    var day = d.getDay();
+    var diff = (day === 0 ? -6 : 1) - day; // back to Monday
+    d.setDate(d.getDate() + diff);
+    return todayStr(d);
+  }
+  function uid(){ return Math.random().toString(36).slice(2,10); }
+
+  var defaultData = {
+    goals: [
+      { id: uid(), name: 'Forex', role: 'vehicle', anchor: 'Trade review + journal entry', status: 'active' },
+      { id: uid(), name: 'Builder Protocol', role: 'depth', anchor: 'Tier work session, 90 min', status: 'active' }
+    ],
+    log: {},        // { 'YYYY-MM-DD': { anchors: {goalId: true}, adhoc: [{id, text, goalId, done}] } }
+    reviews: [],     // { weekStart, shipped, confidence, loggedOn }
+    lastReviewDismissedWeek: null
+  };
+
+  var data = load();
+
+  function load(){
+    try {
+      var raw = localStorage.getItem(STORAGE_KEY);
+      if (!raw) return JSON.parse(JSON.stringify(defaultData));
+      var parsed = JSON.parse(raw);
+      if (!parsed.goals) parsed.goals = [];
+      if (!parsed.log) parsed.log = {};
+      if (!parsed.reviews) parsed.reviews = [];
+      return parsed;
+    } catch(e){
+      console.error('Bearing: load failed', e);
+      return JSON.parse(JSON.stringify(defaultData));
+    }
+  }
+  function save(){
+    try {
+      localStorage.setItem(STORAGE_KEY, JSON.stringify(data));
+    } catch(e){
+      console.error('Bearing: save failed', e);
+    }
+  }
+  function dayEntry(dateStr){
+    if (!data.log[dateStr]) data.log[dateStr] = { anchors: {}, adhoc: [] };
+    if (!data.log[dateStr].adhoc) data.log[dateStr].adhoc = [];
+    if (!data.log[dateStr].anchors) data.log[dateStr].anchors = {};
+    return data.log[dateStr];
+  }
+
+  function activeGoals(){
+    return data.goals.filter(function(g){ return g.status === 'active'; });
+  }
+
+  function computeStreak(goalId){
+    var streak = 0;
+    var d = todayStr();
+    // don't penalize today until it's actually missed — start check from today,
+    // but if today isn't done yet, begin counting from yesterday instead.
+    var entry = data.log[d];
+    if (!(entry && entry.anchors && entry.anchors[goalId])) {
+      d = addDays(d, -1);
+    }
+    while (true) {
+      var e = data.log[d];
+      if (e && e.anchors && e.anchors[goalId]) {
+        streak++;
+        d = addDays(d, -1);
+      } else {
+        break;
+      }
+    }
+    return streak;
+  }
+
+  function roleLabel(role){
+    if (role === 'vehicle') return 'vehicle — commercial';
+    if (role === 'depth') return 'depth — mastery';
+    return 'exploring';
+  }
+
+  function render(){
+    document.getElementById('todayLabel').textContent = new Date().toLocaleDateString(undefined, { weekday: 'long', month: 'long', day: 'numeric' });
+
+    var streakParts = activeGoals().map(function(g){
+      return g.name + ' ' + computeStreak(g.id) + 'd';
+    });
+    document.getElementById('streakLine').textContent = streakParts.join('   ·   ');
+
+    renderGoals();
+    renderToday();
+    renderReviewPrompt();
+    renderReviewForm();
+    renderReviewHistory();
+    renderAdhocGoalOptions();
+  }
+
+  function renderGoals(){
+    var el = document.getElementById('goalsList');
+    if (data.goals.length === 0) {
+      el.innerHTML = '<div class="empty">Add the first vehicle you\'re piloting toward the goal.</div>';
+      return;
+    }
+    el.innerHTML = '';
+    data.goals.forEach(function(g){
+      var div = document.createElement('div');
+      div.className = 'goal';
+      var statusNote = g.status !== 'active' ? ' · ' + g.status : '';
+      div.innerHTML =
+        '<div class="goal-head">' +
+          '<span class="goal-name">' + escapeHtml(g.name) + '</span>' +
+          '<span class="goal-role">' + roleLabel(g.role) + escapeHtml(statusNote) + '</span>' +
+        '</div>' +
+        '<div class="goal-anchor">' + escapeHtml(g.anchor || 'No daily anchor set') + '</div>';
+      var actions = document.createElement('div');
+      actions.className = 'goal-actions';
+
+      if (g.status === 'active') {
+        actions.appendChild(makeBtn('Pause', function(){ g.status = 'paused'; save(); render(); }));
+        actions.appendChild(makeBtn('Mark done', function(){
+          if (confirm('Mark "' + g.name + '" as done? It will stop appearing in Today, but its history stays.')) {
+            g.status = 'done'; save(); render();
+          }
+        }));
+      } else if (g.status === 'paused') {
+        actions.appendChild(makeBtn('Resume', function(){ g.status = 'active'; save(); render(); }));
+      } else if (g.status === 'done') {
+        actions.appendChild(makeBtn('Reopen', function(){ g.status = 'active'; save(); render(); }));
+      }
+      div.appendChild(actions);
+      el.appendChild(div);
+    });
+  }
+
+  function makeBtn(label, onClick){
+    var b = document.createElement('button');
+    b.type = 'button';
+    b.textContent = label;
+    b.addEventListener('click', onClick);
+    return b;
+  }
+
+  function escapeHtml(s){
+    return String(s == null ? '' : s).replace(/[&<>"']/g, function(c){
+      return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[c];
+    });
+  }
+
+  function renderToday(){
+    var el = document.getElementById('todayList');
+    var d = todayStr();
+    var entry = dayEntry(d);
+    var goals = activeGoals();
+
+    var rows = [];
+
+    goals.forEach(function(g){
+      if (!g.anchor) return;
+      var checked = !!entry.anchors[g.id];
+      rows.push({ type: 'anchor', goal: g, checked: checked });
+    });
+    entry.adhoc.forEach(function(t){
+      rows.push({ type: 'adhoc', task: t });
+    });
+
+    if (rows.length === 0) {
+      el.innerHTML = '<div class="empty">No anchors set. Add a vehicle with a daily anchor task, or add one below.</div>';
+      return;
+    }
+
+    el.innerHTML = '';
+    rows.forEach(function(r){
+      var row = document.createElement('div');
+      row.className = 'task-row';
+      var cb = document.createElement('input');
+      cb.type = 'checkbox';
+
+      var textSpan = document.createElement('span');
+      textSpan.className = 'task-text';
+
+      if (r.type === 'anchor') {
+        cb.checked = r.checked;
+        textSpan.classList.toggle('done', r.checked);
+        textSpan.innerHTML = escapeHtml(r.goal.anchor) + '<span class="task-goal-tag">' + escapeHtml(r.goal.name) + '</span>';
+        cb.addEventListener('change', function(){
+          entry.anchors[r.goal.id] = cb.checked;
+          save(); render();
+        });
+      } else {
+        cb.checked = !!r.task.done;
+        textSpan.classList.toggle('done', !!r.task.done);
+        var goalName = '';
+        if (r.task.goalId) {
+          var g2 = data.goals.find(function(x){ return x.id === r.task.goalId; });
+          if (g2) goalName = g2.name;
+        }
+        textSpan.innerHTML = escapeHtml(r.task.text) + (goalName ? '<span class="task-goal-tag">' + escapeHtml(goalName) + '</span>' : '');
+        cb.addEventListener('change', function(){
+          r.task.done = cb.checked;
+          save(); render();
+        });
+      }
+
+      row.appendChild(cb);
+      row.appendChild(textSpan);
+      el.appendChild(row);
+    });
+  }
+
+  function renderAdhocGoalOptions(){
+    var sel = document.getElementById('adhocGoal');
+    sel.innerHTML = '<option value="">No vehicle</option>';
+    activeGoals().forEach(function(g){
+      var opt = document.createElement('option');
+      opt.value = g.id;
+      opt.textContent = g.name;
+      sel.appendChild(opt);
+    });
+  }
+
+  function renderReviewPrompt(){
+    var slot = document.getElementById('reviewPromptSlot');
+    var d = todayStr();
+    var thisWeek = isoWeekStart(d);
+    var dow = new Date(d + 'T00:00:00').getDay();
+    var alreadyReviewed = data.reviews.some(function(r){ return r.weekStart === thisWeek; });
+    var dismissed = data.lastReviewDismissedWeek === thisWeek;
+
+    if (dow === REVIEW_DAY && !alreadyReviewed && !dismissed) {
+      slot.innerHTML = '';
+      var box = document.createElement('div');
+      box.className = 'review-prompt';
+      box.innerHTML = '<p>It\'s review day. What did you actually finish this week, on paper?</p>';
+      var btnRow = document.createElement('div');
+      var goBtn = makeBtn('Log it now', function(){
+        document.getElementById('reviewForm').scrollIntoView({ behavior: 'smooth', block: 'center' });
+      });
+      btnRow.appendChild(goBtn);
+      box.appendChild(btnRow);
+      slot.appendChild(box);
+    } else {
+      slot.innerHTML = '';
+    }
+  }
+
+  function renderReviewForm(){
+    var el = document.getElementById('reviewForm');
+    el.innerHTML = '';
+    var ta = document.createElement('textarea');
+    ta.placeholder = 'What did you ship this week that a stranger could verify? (a bot delivered, a tier passed, trades journaled...)';
+    var sel = document.createElement('select');
+    [1,2,3,4,5].forEach(function(n){
+      var opt = document.createElement('option');
+      opt.value = n;
+      opt.textContent = n + ' / 5 — confidence you\'re on bearing';
+      if (n === 3) opt.selected = true;
+      sel.appendChild(opt);
+    });
+    var btn = document.createElement('button');
+    btn.className = 'primary';
+    btn.type = 'button';
+    btn.textContent = 'Save review';
+    btn.style.marginTop = '4px';
+    btn.addEventListener('click', function(){
+      if (!ta.value.trim()) return;
+      var d = todayStr();
+      data.reviews.unshift({
+        weekStart: isoWeekStart(d),
+        shipped: ta.value.trim(),
+        confidence: sel.value,
+        loggedOn: d
+      });
+      data.lastReviewDismissedWeek = isoWeekStart(d);
+      save();
+      render();
+    });
+    el.appendChild(ta);
+    el.appendChild(sel);
+    el.appendChild(document.createElement('br'));
+    el.appendChild(btn);
+  }
+
+  function renderReviewHistory(){
+    var el = document.getElementById('reviewHistory');
+    if (data.reviews.length === 0) {
+      el.innerHTML = '<div class="empty" style="margin-top:14px;">No reviews logged yet.</div>';
+      return;
+    }
+    el.innerHTML = '<div style="margin-top:16px;"></div>';
+    var wrap = el.querySelector('div');
+    data.reviews.slice(0, 12).forEach(function(r){
+      var d = document.createElement('div');
+      d.className = 'review-entry';
+      d.innerHTML = '<div class="review-week">Week of ' + r.weekStart + ' · ' + r.confidence + '/5</div>' +
+        '<div>' + escapeHtml(r.shipped) + '</div>';
+      wrap.appendChild(d);
+    });
+  }
+
+  document.getElementById('addGoalBtn').addEventListener('click', function(){
+    var name = document.getElementById('goalName').value.trim();
+    var role = document.getElementById('goalRole').value;
+    var anchor = document.getElementById('goalAnchor').value.trim();
+    if (!name) return;
+    data.goals.push({ id: uid(), name: name, role: role, anchor: anchor, status: 'active' });
+    document.getElementById('goalName').value = '';
+    document.getElementById('goalAnchor').value = '';
+    save(); render();
+  });
+
+  document.getElementById('adhocForm').addEventListener('submit', function(e){
+    e.preventDefault();
+    var text = document.getElementById('adhocText').value.trim();
+    var goalId = document.getElementById('adhocGoal').value || null;
+    if (!text) return;
+    var entry = dayEntry(todayStr());
+    entry.adhoc.push({ id: uid(), text: text, goalId: goalId, done: false });
+    document.getElementById('adhocText').value = '';
+    save(); render();
+  });
+
+  document.getElementById('resetBtn').addEventListener('click', function(){
+    if (confirm('Clear everything stored by Bearing on this device? This cannot be undone.')) {
+      try { localStorage.removeItem(STORAGE_KEY); } catch(e){}
+      data = JSON.parse(JSON.stringify(defaultData));
+      save(); render();
+    }
+  });
+
+  render();
+})();
+</script>
+</body>
+</html>
